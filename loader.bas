@@ -1,0 +1,4 @@
+10 REM Randplot loader
+20 CLEAR 32767
+30 LOAD "randplot" CODE
+40 RANDOMIZE USR 32768
