@@ -68,10 +68,27 @@ void print_character_at(ubyte row, ubyte col, char character)
 void print_string_at(ubyte row, ubyte col, char *text);
 void print_string_at(ubyte row, ubyte col, char *text)
 {
+	const char *chars = (char *)*(sys_chars); // default = 0x3C00
+
 	char character = *(text++);
+	uword character_offset = character << 3;  // 8* as each char takes 8 bytes
+
+	char *screen_location = (char *)get_char_address(col, row);
+	char *character_location = (char *)(chars + character_offset);
+
 	do {
-		print_character_at(row, col++, character);
-		character = *(text++);
+		char *pixel_row = screen_location;  // start at the top left
+		for (int counter = 0; counter < 8; counter++) {
+			// copy byte to screen memory
+			*pixel_row = *character_location;
+			// and move to next pixel row
+			pixel_row += 0x0100;
+			character_location++;  // next row of pixels
+		}
+		character = *(text++);  // next character
+		character_offset = character << 3;
+		character_location = (char *)(chars + character_offset);
+		screen_location++;  // step to next character position
 	} while (character);  // assume null-terminated
 }
 
